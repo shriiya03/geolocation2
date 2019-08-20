@@ -1,0 +1,120 @@
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" href="js/jquery.mobile-1.4.5.css">
+<script src="js/jquery.js"></script>
+<script src="js/jquery.mobile-1.4.5.js"></script>
+  
+  <link rel="stylesheet" href="js/leaflet/leaflet.css"/>
+  <script src="js/leaflet/leaflet.js"></script>
+    <script src="js/esri-leaflet-v2.2.3/dist/esri-leaflet.js"></script>
+
+    <!-- Load Leaflet-->
+     <link rel="stylesheet" href="js/leafletGeo/leaflet.css" />
+     <script src="js/leafletGeo/leaflet-src.js"></script>
+
+     <!-- Load Esri Leaflet  -->
+     <script src="js/esri-leaflet-v2.2.4/dist/esri-leaflet-debug.js"></script>
+
+     <!-- Esri Leaflet Geocoder -->
+     <link rel="stylesheet" href="js/esri-leaflet-geocoder-v2.2.14/dist/esri-leaflet-geocoder.css"/>
+     <script src="js/esri-leaflet-geocoder-v2.2.14/dist/esri-leaflet-geocoder-debug.js"></script>
+	 
+
+<title>Geolocation Example</title>
+  <script type="text/javascript">
+
+  if (navigator.geolocation == undefined) {
+alert("Geolocation undefined");
+}
+
+else {
+  alert("Geolocation Available");
+  navigator.geolocation.getCurrentPosition(userLocated,locationError,
+  {timeout:10000, maximumAge: 30000, enableHighAccuracy:false});
+
+function userLocated(position)
+{
+  var latitude =position.coords.latitude;
+  var longitude =position.coords.longitude;
+  alert("Lat:"+latitude+",Long:"+longitude);
+
+
+  var mymap = L.map('mapid').setView([latitude, longitude], 12);
+
+  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+  maxZoom: 19,
+  attribution: 'Map data &copy;'+
+  '<a href="https://www.openstreetmap.org/">OpenStreetMap</a>'+
+  'contributors,<a href="https://creativecommons.org/licenses'+
+  '/by-sa/2.0/">CC-BY-SA</a>,Imagery © <a href="https://'+
+  'www.mapbox.com/">Mapbox</a>',
+  id: 'mapbox.streets',
+  accessToken:'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYyc'+
+  'XBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
+  }).addTo(mymap);
+
+  var marker = L.marker([latitude, longitude]).addTo(mymap);
+
+  var circle = L.circle([latitude, longitude], {
+  color: 'red',
+  fillColor: '#f03',
+  fillOpacity: 0.5,
+  radius: 100
+  }).addTo(mymap);
+  circle.bindPopup("You may find the treasure around here");
+
+  var marker = L.marker([latitude, longitude]).addTo(mymap);
+  var tiles = L.esri.basemapLayer("Streets").addTo(mymap);
+
+  // create the geocoding control and add it to the map
+  var searchControl = L.esri.Geocoding.geosearch().addTo(mymap);
+
+  // create an empty layer group to store the results and add it to the map
+  var results = L.layerGroup().addTo(mymap);
+
+  // listen for the results event and add every result to the map
+  searchControl.on("results", function(data) {
+      results.clearLayers();
+      for (var i = data.results.length - 1; i >= 0; i--) {
+          results.addLayer(L.marker(data.results[i].latlng));
+      }
+  });
+
+
+
+}
+
+function locationError(error){
+  switch(error.code)
+  {
+    case error.PERMISSION_DENIED:
+    alert("permission Denied-"+error.message);
+    break;
+    case error.POSITION_UNAVAILABLE:
+    alert("position Not Available-"+error.message);
+    break;
+    case error.TIMEOUT:
+    alert("Request Time out-"+error.message);
+    break;
+
+  }
+}
+
+}
+
+</script>
+
+</head>
+
+<body>
+<div id="mapid" style="width: 300px; height: 200px;">
+
+
+</div>
+</body>
+
+
+</html>
